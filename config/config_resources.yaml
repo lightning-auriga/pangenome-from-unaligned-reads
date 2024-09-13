@@ -1,0 +1,29 @@
+partitions:
+  small:
+    - "spotshort"
+  large:
+    - "comp"
+  huge:
+    - "hpc"
+
+tmpdir: "temp"
+
+default:
+  threads: 1
+  memory: 3800
+  partition: "small"
+
+awscli:
+  threads: 1
+  memory: 3800
+  partition: "small"
+
+bowtie2-build:
+  threads: 2
+  memory: 8000
+  partition: "large"
+
+bowtie2-align:
+  threads: 4
+  memory: 8000
+  partition: "large"

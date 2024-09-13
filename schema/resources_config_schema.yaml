@@ -1,0 +1,39 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+description: tool/rule-specific resource configuration
+properties:
+  partitions:
+    patternProperties:
+      "^.*$":
+        type: array
+        items:
+          type: string
+  tmpdir:
+    type: string
+  default: &defaults
+    type: object
+    properties:
+      threads:
+        type: integer
+        min: 1
+      memory:
+        type: integer
+        min: 100
+      partition:
+        type: string
+    required:
+      - threads
+      - memory
+      - partition
+    additionalProperties: false
+  awscli:
+    <<: *defaults
+  bowtie2-build:
+    <<: *defaults
+  bowtie2-align:
+    <<: *defaults
+required:
+  - partitions
+  - awscli
+  - bowtie2-build
+  - bowtie2-align
+additionalProperties: false

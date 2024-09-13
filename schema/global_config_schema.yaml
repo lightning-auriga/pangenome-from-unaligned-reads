@@ -3,6 +3,18 @@ description: global configuration
 properties:
   manifest:
     type: string
+  reference-genome:
+    type: object
+    properties:
+      name:
+        type: string
+      fasta:
+        type: string
+    required:
+      - name
+      - fasta
+    additionalProperties: no
 required:
   - manifest
+  - reference-genome
 additionalProperties: no

@@ -36,9 +36,22 @@ validate(config, "../schema/global_config_schema.yaml")
 manifest = pd.read_table(config["manifest"], sep="\t").set_index("sampleid", drop=False)
 validate(manifest, "../schema/manifest_schema.yaml")
 
-TARGETS = []
+with open("config/config_resources.yaml", "r") as f:
+    config_resources = yaml.safe_load(f)
+validate(config_resources, "../schema/resources_config_schema.yaml")
+
+
+TARGETS = expand(
+    "results/initial-alignments/{reference_genome}/{sampleid}.bam",
+    reference_genome=config["reference-genome"]["name"],
+    sampleid=manifest.index,
+)
 
 
 rule all:
     input:
         TARGETS,
+
+
+include: "rules/acquire-input-data.smk"
+include: "rules/align-raw-reads.smk"
