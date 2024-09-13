@@ -1,0 +1,6 @@
+*.smk linguist-language=Python
+Snakefile linguist-language=Python
+/workflow/rules/*.smk gitlab-language=python
+/workflow/Snakefile gitlab-language=python
+/workflow/rules/*.smk github-language=python
+/workflow/Snakefile github-language=python

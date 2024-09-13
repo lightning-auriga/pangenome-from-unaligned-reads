@@ -1,0 +1,6 @@
+name: pangenome-from-unaligned-reads
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - snakemake
