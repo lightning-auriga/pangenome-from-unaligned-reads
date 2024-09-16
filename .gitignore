@@ -1,3 +1,38 @@
+# deepvariant/parallel efflux
+.parallel
+.keras
+
+# infrastructure related to containers
+.cache
+.java
+.wget-hsts
+
+# Testing refuse
+.coverage
+
+# ad hoc temp space
+temp/
+
+# Genomic reference data
+references/
+reference_data/
+
+# Logs from cluster submissions
+logs/
+run_*.o*
+run_*.e*
+slurm*out
+
+# Emacs backup files
+*~
+
+# Vim swap files
+*.swp
+
+# Commitizen Infrastructure
+node_modules
+package*json
+
 # Project Folders
 results
 results/*
