@@ -31,9 +31,12 @@ properties:
     <<: *defaults
   bowtie2-align:
     <<: *defaults
+  samtools-sort:
+    <<: *defaults
 required:
   - partitions
   - awscli
   - bowtie2-build
   - bowtie2-align
+  - samtools-sort
 additionalProperties: false

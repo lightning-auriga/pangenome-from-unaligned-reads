@@ -27,3 +27,8 @@ bowtie2-align:
   threads: 4
   memory: 8000
   partition: "large"
+
+samtools-sort:
+  threads: 4
+  memory: 8000
+  partition: "large"

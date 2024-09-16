@@ -1,2 +1,2 @@
 sampleid	R1	R2
-sample	/path/to/sample.R1.fq.gz	/path/to/sample.R2.fq.gz
+sample	/fsx/wgs-short-read/RU42218/fastqs/SQ6131_L001_R1_001.fastq.gz	/fsx/wgs-short-read/RU42218/fastqs/SQ6131_L001_R2_001.fastq.gz

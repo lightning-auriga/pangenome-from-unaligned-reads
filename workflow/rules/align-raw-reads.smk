@@ -13,7 +13,7 @@ rule bowtie2_align_raw_reads:
             suffix=["1.bt2", "2.bt2", "3.bt2", "4.bt2", "rev.1.bt2", "rev.2.bt2"],
         ),
     output:
-        bam="results/initial-alignments/{reference_genome}/{sampleid}.bam",
+        bam="results/initial-alignments/{reference_genome}/all-pairs/{sampleid}.bam",
     benchmark:
         "results/performance_benchmarks/bowtie2_align_raw_reads/{reference_genome}/{sampleid}.tsv"
     params:
@@ -29,3 +29,95 @@ rule bowtie2_align_raw_reads:
     shell:
         "bowtie2 -x {params.index_prefix} -1 {input.R1} -2 {input.R2} --threads {threads} | "
         "samtools view -@1 -bt {input.fai} -o {output.bam} - "
+
+
+rule extract_unaligned_pairs:
+    """
+    Take initial basic bowtie2 alignments and select read pairs that had neither read map
+    to the corresponding reference genome.
+    """
+    input:
+        bam="results/initial-alignments/{reference_genome}/all-pairs/{sampleid}.bam",
+    output:
+        bam="results/initial-alignments/{reference_genome}/unaligned-pairs/{sampleid}.bam",
+    benchmark:
+        "results/performance_benchmarks/extract_unaligned_pairs/{reference_genome}/{sampleid}.tsv"
+    conda:
+        "../envs/samtools.yaml"
+    threads: config_resources["default"]["threads"]
+    resources:
+        mem_mb=config_resources["default"]["memory"],
+        slurm_partition=rc.select_partition(
+            config_resources["default"]["partition"], config_resources["partitions"]
+        ),
+    shell:
+        "samtools view --no-PG -e 'flag.unmap && flag.munmap' -o {output.bam} {input.bam}"
+
+
+rule extract_half_aligned_pairs:
+    """
+    Take initial basic bowtie2 alignments and select read pairs that had exactly one read
+    of the pair map to the corresponding reference genome.
+    """
+    input:
+        bam="results/initial-alignments/{reference_genome}/all-pairs/{sampleid}.bam",
+    output:
+        bam="results/initial-alignments/{reference_genome}/half-aligned-pairs/{sampleid}.bam",
+    benchmark:
+        "results/performance_benchmarks/extract_half_aligned_pairs/{reference_genome}/{sampleid}.tsv"
+    conda:
+        "../envs/samtools.yaml"
+    threads: config_resources["default"]["threads"]
+    resources:
+        mem_mb=config_resources["default"]["memory"],
+        slurm_partition=rc.select_partition(
+            config_resources["default"]["partition"], config_resources["partitions"]
+        ),
+    shell:
+        "samtools view --no-PG -e '(flag.unmap && !flag.munmap) || (!flag.unmap && flag.munmap)' -o {output.bam} {input.bam}"
+
+
+rule sort_aligned_raw_reads:
+    """
+    As part of testing out interactions with the primary alignments, this rule sorts the alignments
+    to allow indexing and random region access.
+    """
+    input:
+        bam="results/initial-alignments/{reference_genome}/{pairset}/sampleid}.bam",
+    output:
+        bam="results/initial-alignments-sorted/{reference_genome}/{pairset}/{sampleid}.bam",
+    benchmark:
+        "results/performance_benchmarks/sort_aligned_raw_reads/{reference_genome}/{pairset}/{sampleid}.tsv"
+    conda:
+        "../envs/samtools.yaml"
+    threads: config_resources["samtools-sort"]["threads"]
+    resources:
+        mem_mb=config_resources["samtools-sort"]["memory"],
+        slurm_partition=rc.select_partition(
+            config_resources["samtools-sort"]["partition"], config_resources["partitions"]
+        ),
+        tmpdir=tempDir,
+    shell:
+        "samtools sort -@ {threads} -T {resources.tmpdir} -o {output.bam} {input.bam}"
+
+
+rule samtools_index_bam:
+    """
+    Take an arbitrary bam file, which implicitly must be sorted, and index it.
+    """
+    input:
+        bam="{prefix}.bam",
+    output:
+        bai="{prefix}.bai",
+    benchmark:
+        "results/performance_benchmarks/samtools_index_bam/{prefix}.tsv"
+    conda:
+        "../envs/samtools.yaml"
+    threads: config_resources["default"]["threads"]
+    resources:
+        mem_mb=config_resources["default"]["memory"],
+        slurm_partition=rc.select_partition(
+            config_resources["default"]["partition"], config_resources["partitions"]
+        ),
+    shell:
+        "samtools index -@ {threads} -o {output.bai} {input.bam}"

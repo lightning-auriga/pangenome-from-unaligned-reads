@@ -40,10 +40,12 @@ with open("config/config_resources.yaml", "r") as f:
     config_resources = yaml.safe_load(f)
 validate(config_resources, "../schema/resources_config_schema.yaml")
 
+tempDir = config_resources["tmpdir"] if "tmpdir" in config_resources else tempfile.gettempdir()
 
 TARGETS = expand(
-    "results/initial-alignments/{reference_genome}/{sampleid}.bam",
+    "results/initial-alignments/{reference_genome}/{subset_type}/{sampleid}.bam",
     reference_genome=config["reference-genome"]["name"],
+    subset_type=["unaligned-pairs", "half-aligned-pairs"],
     sampleid=manifest.index,
 )
 
