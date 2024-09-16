@@ -43,10 +43,19 @@ validate(config_resources, "../schema/resources_config_schema.yaml")
 tempDir = config_resources["tmpdir"] if "tmpdir" in config_resources else tempfile.gettempdir()
 
 TARGETS = expand(
-    "results/initial-alignments/{reference_genome}/{subset_type}/{sampleid}.bam",
+    "results/initial-alignments/{reference_genome}/unaligned-pairs/{sampleid}_{readgroup}.fastq.gz",
     reference_genome=config["reference-genome"]["name"],
-    subset_type=["unaligned-pairs", "half-aligned-pairs"],
     sampleid=manifest.index,
+    readgroup=["R1", "R2"],
+)
+
+TARGETS.extend(
+    expand(
+        "results/initial-alignments/{reference_genome}/half-aligned-pairs/{sampleid}_{mapping}.fastq.gz",
+        reference_genome=config["reference-genome"]["name"],
+        sampleid=manifest.index,
+        mapping=["mapped", "unmapped"],
+    )
 )
 
 

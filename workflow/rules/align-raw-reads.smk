@@ -77,6 +77,68 @@ rule extract_half_aligned_pairs:
         "samtools view --no-PG -e '(flag.unmap && !flag.munmap) || (!flag.unmap && flag.munmap)' -o {output.bam} {input.bam}"
 
 
+rule unaligned_pairs_bam_to_fastq:
+    input:
+        bam="results/initial-alignments/{reference_genome}/unaligned-pairs/{sampleid}.bam",
+    output:
+        fastq_r1="results/initial-alignments/{reference_genome}/unaligned-pairs/{sampleid}_R1.fastq.gz",
+        fastq_r2="results/initial-alignments/{reference_genome}/unaligned-pairs/{sampleid}_R2.fastq.gz",
+    benchmark:
+        "results/performance_benchmarks/unaligned_pairs_bam_to_fastq/{reference_genome}/{sampleid}.tsv"
+    conda:
+        "../envs/samtools.yaml"
+    threads: config_resources["default"]["threads"]
+    resources:
+        mem_mb=config_resources["default"]["memory"],
+        slurm_partition=rc.select_partition(
+            config_resources["default"]["partition"], config_resources["partitions"]
+        ),
+    shell:
+        "samtools fastq -1 {output.fastq_r1} -2 {output.fastq_r2} -0 /dev/null -s /dev/null {input.bam}"
+
+
+rule half_aligned_pairs_bam_to_unmapped_read_fastq:
+    input:
+        bam="results/initial-alignments/{reference_genome}/half-aligned-pairs/{sampleid}.bam",
+    output:
+        fastq="results/initial-alignments/{reference_genome}/half-aligned-pairs/{sampleid}_unmapped.fastq.gz",
+    benchmark:
+        "results/performance_benchmarks/half_aligned_pairs_bam_to_unmapped_read_fastq/{reference_genome}/{sampleid}.tsv"
+    conda:
+        "../envs/samtools.yaml"
+    threads: config_resources["default"]["threads"]
+    resources:
+        mem_mb=config_resources["default"]["memory"],
+        slurm_partition=rc.select_partition(
+            config_resources["default"]["partition"], config_resources["partitions"]
+        ),
+    shell:
+        "samtools view -e 'flag.unmap' -b {input.bam} | "
+        "samtools fastq - | "
+        "bgzip -c > {output.fastq}"
+
+
+rule half_aligned_pairs_bam_to_mapped_read_fastq:
+    input:
+        bam="results/initial-alignments/{reference_genome}/half-aligned-pairs/{sampleid}.bam",
+    output:
+        fastq="results/initial-alignments/{reference_genome}/half-aligned-pairs/{sampleid}_mapped.fastq.gz",
+    benchmark:
+        "results/performance_benchmarks/half_aligned_pairs_bam_to_mapped_read_fastq/{reference_genome}/{sampleid}.tsv"
+    conda:
+        "../envs/samtools.yaml"
+    threads: config_resources["default"]["threads"]
+    resources:
+        mem_mb=config_resources["default"]["memory"],
+        slurm_partition=rc.select_partition(
+            config_resources["default"]["partition"], config_resources["partitions"]
+        ),
+    shell:
+        "samtools view -e '!flag.unmap' -b {input.bam} | "
+        "samtools fastq - | "
+        "bgzip -c > {output.fastq}"
+
+
 rule sort_aligned_raw_reads:
     """
     As part of testing out interactions with the primary alignments, this rule sorts the alignments
