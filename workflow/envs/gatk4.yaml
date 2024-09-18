@@ -1,0 +1,7 @@
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - gatk4
+  - snakemake-wrapper-utils
+  - r-base >=4

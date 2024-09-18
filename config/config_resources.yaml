@@ -28,6 +28,12 @@ bowtie2-align:
   memory: 8000
   partition: "large"
 
+gatk-collectinsertsizemetrics:
+  threads: 1
+  memory: 3800
+  partition: "small"
+  java-args: "-Djava.io.tmpdir=temp/ -XX:CompressedClassSpaceSize=200m -XX:+UseParallelGC -XX:ParallelGCThreads=1 -Xmx3000m"
+
 samtools-sort:
   threads: 4
   memory: 8000

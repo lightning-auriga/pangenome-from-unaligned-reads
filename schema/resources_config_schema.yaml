@@ -25,12 +25,33 @@ properties:
       - memory
       - partition
     additionalProperties: false
+  default_with_java: &defaults_with_java
+    type: object
+    properties:
+      threads:
+        type: integer
+        min: 1
+      memory:
+        type: integer
+        min: 100
+      partition:
+        type: string
+      java-args:
+        type: string
+    required:
+      - threads
+      - memory
+      - partition
+      - java-args
+    additionalProperties: false
   awscli:
     <<: *defaults
   bowtie2-build:
     <<: *defaults
   bowtie2-align:
     <<: *defaults
+  gatk-collectinsertsizemetrics:
+    <<: *defaults_with_java
   samtools-sort:
     <<: *defaults
 required:
@@ -38,5 +59,6 @@ required:
   - awscli
   - bowtie2-build
   - bowtie2-align
+  - gatk-collectinsertsizemetrics
   - samtools-sort
 additionalProperties: false

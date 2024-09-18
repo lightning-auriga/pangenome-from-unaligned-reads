@@ -145,7 +145,7 @@ rule sort_aligned_raw_reads:
     to allow indexing and random region access.
     """
     input:
-        bam="results/initial-alignments/{reference_genome}/{pairset}/sampleid}.bam",
+        bam="results/initial-alignments/{reference_genome}/{pairset}/{sampleid}.bam",
     output:
         bam="results/initial-alignments-sorted/{reference_genome}/{pairset}/{sampleid}.bam",
     benchmark:

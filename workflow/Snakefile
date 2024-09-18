@@ -66,3 +66,4 @@ rule all:
 
 include: "rules/acquire-input-data.smk"
 include: "rules/align-raw-reads.smk"
+include: "rules/emulate-masurca.smk"
