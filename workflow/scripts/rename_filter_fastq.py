@@ -19,17 +19,18 @@ def prepare_fastq_entry(f, entry_count) -> str:
     return res
 
 
-def rename_filter_fastq(R1: str, R2: str, combined: str) -> None:
+def rename_filter_fastq(R1: str, R2: str, unpaired: str, combined: str) -> None:
     """
     Interleave paired reads from two fastqs into an output fastq.
     Not sure why masurca is doing it this way but maybe we'll find out..
     """
     r1_open = gz.open if R1.endswith(".gz") else open
     r2_open = gz.open if R2.endswith(".gz") else open
+    unpaired_open = gz.open if unpaired.endswith(".gz") else open
     out_open = gz.open if combined.endswith(".gz") else open
-    with r1_open(R1, "rt") as f1:
-        with r2_open(R2, "rt") as f2:
-            with out_open(combined, "wt") as out:
+    with out_open(combined, "wt") as out:
+        with r1_open(R1, "rt") as f1:
+            with r2_open(R2, "rt") as f2:
                 entry_count = 1
                 while 1:
                     r1_output = prepare_fastq_entry(f1, entry_count)
@@ -41,10 +42,19 @@ def rename_filter_fastq(R1: str, R2: str, combined: str) -> None:
                     out.write(r1_output)
                     out.write(r2_output)
                     entry_count += 2
+        with unpaired_open(unpaired, "rt") as f3:
+            entry_count = 1
+            while 1:
+                unpaired_output = prepare_fastq_entry(f3, entry_count)
+                if len(unpaired_output) == 0:
+                    break
+                out.write(unpaired_output)
+                entry_count += 2
 
 
 rename_filter_fastq(
     snakemake.input["R1"],  # noqa: F821
     snakemake.input["R2"],  # noqa: F821
+    snakemake.input["unpaired"],  # noqa: F821
     snakemake.output["fq"],  # noqa: F821
 )

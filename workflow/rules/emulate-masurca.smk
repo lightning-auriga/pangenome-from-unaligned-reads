@@ -38,12 +38,13 @@ rule rename_filter_fastq:
     Pulling in the existing samtools env just for bgzip.
     """
     input:
-        R1="{prefix}_R1.fastq.gz",
-        R2="{prefix}_R2.fastq.gz",
+        R1="results/initial-alignments/{reference_genome}/unaligned-pairs/{sampleid}_R1.fastq.gz",
+        R2="results/initial-alignments/{reference_genome}/unaligned-pairs/{sampleid}_R2.fastq.gz",
+        unpaired="results/initial-alignments/{reference_genome}/half-aligned-pairs/{sampleid}_unmapped.fastq.gz",
     output:
-        fq="{prefix}.renamed.fastq.gz",
+        fq="results/renamed-filtered-fastqs/{reference_genome}/{sampleid}.renamed.fastq.gz",
     benchmark:
-        "results/performance_benchmarks/rename_filter_fastq/{prefix}.tsv"
+        "results/performance_benchmarks/rename_filter_fastq/{reference_genome}/{sampleid}.tsv"
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
