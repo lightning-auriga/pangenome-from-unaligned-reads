@@ -29,7 +29,7 @@ rule collect_insert_size_metrics:
         "-ASSUME_SORTED true -STOP_AFTER 2000000000"
 
 
-rule rename_filter_fastq:
+rule rename_filter_fastq_unmapped_reads:
     """
     Emulate the same function from the masurca/superreads repo.
     Not sure why there are C++ and perl versions of this upstream.
@@ -38,12 +38,40 @@ rule rename_filter_fastq:
     Pulling in the existing samtools env just for bgzip.
     """
     input:
-        R1="{prefix}_R1.fastq.gz",
-        R2="{prefix}_R2.fastq.gz",
+        R1="results/initial-alignments/{reference_genome}/unaligned-pairs/{sampleid}_R1.fastq.gz",
+        R2="results/initial-alignments/{reference_genome}/unaligned-pairs/{sampleid}_R2.fastq.gz",
     output:
-        fq="{prefix}.renamed.fastq.gz",
+        fq="results/initial-alignments/{reference_genome}/unaligned-pairs/{sampleid}.renamed.fastq.gz",
+    params:
+        library_tag="pe",
     benchmark:
-        "results/performance_benchmarks/rename_filter_fastq/{prefix}.tsv"
+        "results/performance_benchmarks/rename_filter_fastq_unmapped_reads/{reference_genome}/{sampleid}.tsv"
+    threads: config_resources["default"]["threads"]
+    resources:
+        mem_mb=config_resources["default"]["memory"],
+        slurm_partition=rc.select_partition(
+            config_resources["default"]["partition"], config_resources["partitions"]
+        ),
+    script:
+        "../scripts/rename_filter_fastq.py"
+
+
+rule rename_filter_fastq_half_aligned_reads:
+    """
+    Emulate the same function from the masurca/superreads repo.
+    Not sure why there are C++ and perl versions of this upstream.
+    Kinda chaotic.
+
+    Pulling in the existing samtools env just for bgzip.
+    """
+    input:
+        R1="results/initial-alignments/{reference_genome}/half-aligned-pairs/{sampleid}_unmapped.fastq.gz",
+    output:
+        fq="results/initial-alignments/{reference_genome}/half-aligned-pairs/{sampleid}_unmapped.renamed.fastq.gz",
+    params:
+        library_tag="se",
+    benchmark:
+        "results/performance_benchmarks/rename_filter_fastq_half_aligned_reads/{reference_genome}/{sampleid}.tsv"
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
