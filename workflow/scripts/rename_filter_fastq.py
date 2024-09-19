@@ -15,7 +15,7 @@ def prepare_fastq_entry(f, entry_count) -> str:
             return ""
         if i == 0:
             val = "@pe{}\n".format(entry_count)
-        res += val
+        res += val[0:250]
     return res
 
 
