@@ -82,9 +82,9 @@ rule rename_filter_fastq_half_aligned_reads:
         "../scripts/rename_filter_fastq.py"
 
 
-rule compute_average_read_length:
+rule compute_read_metrics:
     """
-    Take the upstream masurca logic for this calculation
+    Take the upstream masurca logic for these calculations
     and spin it out into a python script for better handling
     of corner cases and unit testing.
     """
@@ -92,11 +92,11 @@ rule compute_average_read_length:
         "results/initial-alignments/{reference_genome}/unaligned-pairs/{sampleid}.renamed.fastq.gz",
         "results/initial-alignments/{reference_genome}/half-aligned-pairs/{sampleid}_unmapped.renamed.fastq.gz",
     output:
-        "results/read-metrics/{reference_genome}/{sampleid}.average_read_length.tsv",
+        "results/read-metrics/{reference_genome}/{sampleid}.read_metrics.tsv",
     params:
         sampled_read_count=40000,
     benchmark:
-        "results/performance_benchmarks/compute_average_read_length/{reference_genome}/{sampleid}.tsv"
+        "results/performance_benchmarks/compute_read_metrics/{reference_genome}/{sampleid}.tsv"
     threads: config_resources["default"]["threads"]
     resources:
         mem_mb=config_resources["default"]["memory"],
@@ -104,4 +104,4 @@ rule compute_average_read_length:
             config_resources["default"]["partition"], config_resources["partitions"]
         ),
     script:
-        "../scripts/compute_average_read_length.py"
+        "../scripts/compute_read_metrics.py"
