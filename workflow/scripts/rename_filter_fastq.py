@@ -52,7 +52,7 @@ def rename_filter_fastq(R1: str, R2: str, library_tag: str, combined: str) -> No
 
 rename_filter_fastq(
     snakemake.input["R1"],  # noqa: F821
-    snakemake.input["R2"] if "R2" in snakemake.input else None,  # noqa: F821
+    snakemake.input["R2"] if "R2" in snakemake.input.keys() else None,  # noqa: F821
     snakemake.params["library_tag"],  # noqa: F821
     snakemake.output["fq"],  # noqa: F821
 )
